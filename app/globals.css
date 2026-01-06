@@ -1,26 +1,219 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #ffc800;
+  --primary-hover: #ffd633;
+  --primary-dark: #e6b400;
+  --background: #f0f0f0;
+  --foreground: #1a1a1a;
+  --card-bg: #ffffff;
+  --border: #ddd;
+  --border-dark: #ccc;
+  --text-muted: #666;
+  --text-light: #888;
+  --danger: #dc3545;
+  --danger-hover: #c82333;
 }
 
 @theme inline {
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-dark: var(--primary-dark);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card-bg: var(--card-bg);
+  --color-border: var(--border);
+  --color-border-dark: var(--border-dark);
+  --color-text-muted: var(--text-muted);
+  --color-text-light: var(--text-light);
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "맑은 고딕",
+    sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+/* 디시 스타일 테이블 */
+.post-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+}
+
+.post-table th,
+.post-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.post-table th {
+  background: #f8f8f8;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.post-table tr:hover {
+  background: #fafafa;
+}
+
+/* 버튼 스타일 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary-dark);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  text-decoration: none;
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #333;
+  border-color: var(--border-dark);
+}
+
+.btn-secondary:hover {
+  background: #f8f8f8;
+  text-decoration: none;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+.btn-danger:hover {
+  background: var(--danger-hover);
+  text-decoration: none;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+/* 입력 필드 스타일 */
+.input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-size: 13px;
+  background: #fff;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-size: 13px;
+  background: #fff;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* 카드 스타일 */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+.card-header {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: #f8f8f8;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.card-body {
+  padding: 12px;
+}
+
+/* 지껄(좋아요) 버튼 애니메이션 */
+@keyframes jjiggul-pop {
+  0% {
+    transform: scale(0) rotate(-45deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0) rotate(45deg) translateY(-20px);
+    opacity: 0;
+  }
+}
+
+.jjiggul-particle {
+  position: absolute;
+  animation: jjiggul-pop 0.6s ease-out forwards;
+  pointer-events: none;
+  font-size: 16px;
 }
