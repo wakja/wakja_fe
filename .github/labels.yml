@@ -1,0 +1,55 @@
+- name: "✨ feat"
+  color: "1D76DB"
+  description: "New feature"
+
+- name: "🐛 fix"
+  color: "D73A4A"
+  description: "Bug fix"
+
+- name: "♻️ refactor"
+  color: "FBCA04"
+  description: "Refactoring / cleanup"
+
+- name: "🧹 chore"
+  color: "6F42C1"
+  description: "Maintenance"
+
+- name: "📝 docs"
+  color: "0075CA"
+  description: "Documentation"
+
+- name: "🎨 ui"
+  color: "C5DEF5"
+  description: "UI/UX"
+
+- name: "🧩 editor"
+  color: "A2EEEF"
+  description: "Markdown/MDX editor"
+
+- name: "🔐 auth"
+  color: "5319E7"
+  description: "Authentication / session"
+
+- name: "🗄️ db"
+  color: "0E8A16"
+  description: "Database / migration"
+
+- name: "🔌 api"
+  color: "0052CC"
+  description: "API routes / integration"
+
+- name: "🖼️ upload"
+  color: "BFDADC"
+  description: "Image upload / storage"
+
+- name: "🚀 deploy"
+  color: "2EA44F"
+  description: "Deployment / CI"
+
+- name: "🧪 test"
+  color: "D4C5F9"
+  description: "Testing"
+
+- name: "🚧 blocked"
+  color: "B60205"
+  description: "Blocked by something"
