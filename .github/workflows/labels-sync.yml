@@ -7,6 +7,9 @@ on:
       - ".github/labels.yml"
       - ".github/workflows/labels-sync.yml"
 
+permissions:
+  issues: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
