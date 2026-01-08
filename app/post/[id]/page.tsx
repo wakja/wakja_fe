@@ -110,7 +110,7 @@ export default function PostDetailPage() {
           </div>
         </div>
 
-        {/* 좋아요(지껄) 버튼 */}
+        {/* 좋아요(따봉) 버튼 */}
         <div className="px-3 py-3 border-t border-[var(--border)] flex items-center justify-center">
           <button
             type="button"
@@ -120,7 +120,7 @@ export default function PostDetailPage() {
               🗣️
             </span>
             <span className="text-[12px] text-[var(--text-muted)] group-hover:text-[var(--primary-dark)]">
-              지껄{" "}
+              따봉{" "}
               <strong className="text-[var(--primary-dark)]">
                 {mockPost.likeCount}
               </strong>

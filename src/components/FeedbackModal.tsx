@@ -11,10 +11,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* 배경 오버레이 */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* 모달 */}
       <div className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-[2px] w-full max-w-[400px] mx-4 shadow-lg">
@@ -90,10 +87,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             >
               취소
             </button>
-            <button
-              type="button"
-              className="btn btn-primary"
-            >
+            <button type="button" className="btn btn-primary">
               제출
             </button>
           </div>

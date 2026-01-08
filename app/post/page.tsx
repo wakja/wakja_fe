@@ -84,7 +84,7 @@ export default function FeedPage() {
             <th className="text-center">글쓴이</th>
             <th className="text-center">날짜</th>
             <th className="text-center">조회</th>
-            <th className="text-center">지껄</th>
+            <th className="text-center">따봉</th>
           </tr>
         </thead>
         <tbody>

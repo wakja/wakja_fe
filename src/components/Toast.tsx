@@ -6,7 +6,11 @@ interface ToastProps {
   isVisible: boolean;
 }
 
-export default function Toast({ message, type = "info", isVisible }: ToastProps) {
+export default function Toast({
+  message,
+  type = "info",
+  isVisible,
+}: ToastProps) {
   if (!isVisible) return null;
 
   const bgColor = {
@@ -17,7 +21,9 @@ export default function Toast({ message, type = "info", isVisible }: ToastProps)
 
   return (
     <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[100]">
-      <div className={`${bgColor} text-white px-4 py-2 rounded-[2px] shadow-lg text-[13px] animate-fade-in`}>
+      <div
+        className={`${bgColor} text-white px-4 py-2 rounded-[2px] shadow-lg text-[13px] animate-fade-in`}
+      >
         {message}
       </div>
     </div>

@@ -42,7 +42,7 @@ export default function Header() {
                 <span className="text-[12px] text-black/70">
                   {user.nickname}님
                 </span>
-                <button 
+                <button
                   type="button"
                   className="btn btn-sm bg-black/10 border-black/20 text-black hover:bg-black/20"
                 >

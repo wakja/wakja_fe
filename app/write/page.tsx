@@ -119,7 +119,8 @@ export default function WritePage() {
           {/* 이미지 첨부 영역 */}
           <div className="mb-4">
             <label className="block text-[12px] text-[var(--text-muted)] mb-2">
-              이미지 첨부 <span className="text-[var(--text-light)]">(최대 2장)</span>
+              이미지 첨부{" "}
+              <span className="text-[var(--text-light)]">(최대 2장)</span>
             </label>
             <div className="flex items-center gap-3">
               <label className="flex items-center justify-center w-[80px] h-[80px] border border-dashed border-[var(--border)] rounded-[2px] cursor-pointer hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 transition-colors">
@@ -128,7 +129,9 @@ export default function WritePage() {
               </label>
               {/* 첨부된 이미지 미리보기 예시 */}
               <div className="relative w-[80px] h-[80px] border border-[var(--border)] rounded-[2px] bg-[#f8f8f8] flex items-center justify-center">
-                <span className="text-[11px] text-[var(--text-light)]">미리보기</span>
+                <span className="text-[11px] text-[var(--text-light)]">
+                  미리보기
+                </span>
                 <button
                   type="button"
                   className="absolute -top-2 -right-2 w-5 h-5 bg-[var(--danger)] text-white rounded-full text-[12px] leading-none flex items-center justify-center hover:bg-[var(--danger-hover)]"
@@ -141,10 +144,7 @@ export default function WritePage() {
 
           {/* 제출 버튼 */}
           <div className="flex justify-end gap-2 pt-4 border-t border-[var(--border)]">
-            <Link
-              href="/feed"
-              className="btn btn-secondary"
-            >
+            <Link href="/feed" className="btn btn-secondary">
               취소
             </Link>
             <button type="button" className="btn btn-primary">
