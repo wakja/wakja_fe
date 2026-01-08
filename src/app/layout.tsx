@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
+import QueryProvider from "@/lib/QueryProvider";
 
 export const metadata: Metadata = {
   title: "왁자 - 자유롭게 떠들어보세요",
@@ -18,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="ko" className="h-full">
       <body className="h-full flex flex-col">
-        <Header />
-        <main className="flex-1 flex flex-col pt-4">{children}</main>
+        <QueryProvider>
+          <Header />
+          <main className="flex-1 flex flex-col pt-4">{children}</main>
+        </QueryProvider>
       </body>
     </html>
   );
