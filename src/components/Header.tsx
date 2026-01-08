@@ -24,7 +24,7 @@ export default function Header() {
           {/* 네비게이션 */}
           <nav className="flex items-center gap-4">
             <Link
-              href="/feed"
+              href="/post"
               className="text-[13px] text-black hover:underline"
             >
               피드
@@ -42,7 +42,7 @@ export default function Header() {
                 <span className="text-[12px] text-black/70">
                   {user.nickname}님
                 </span>
-                <button
+                <button 
                   type="button"
                   className="btn btn-sm bg-black/10 border-black/20 text-black hover:bg-black/20"
                 >

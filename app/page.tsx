@@ -23,7 +23,7 @@ export default function HomePage() {
         {/* 서브 링크 */}
         <div className="mt-6">
           <Link
-            href="/feed"
+            href="/post"
             className="text-[13px] text-[var(--text-muted)] hover:text-[var(--foreground)]"
           >
             다른 사람들의 이야기 보러가기 &rarr;
