@@ -26,9 +26,27 @@ const mockPost = {
 };
 
 const mockComments = [
-  { id: 1, author: "댓글러1", content: "첫 댓글입니다!", createdAt: "01-06 14:35", isOwner: false },
-  { id: 2, author: "댓글러2", content: "좋은 글이네요 ㅎㅎ", createdAt: "01-06 14:40", isOwner: false },
-  { id: 3, author: "익명123", content: "감사합니다!", createdAt: "01-06 14:45", isOwner: true },
+  {
+    id: 1,
+    author: "댓글러1",
+    content: "첫 댓글입니다!",
+    createdAt: "01-06 14:35",
+    isOwner: false,
+  },
+  {
+    id: 2,
+    author: "댓글러2",
+    content: "좋은 글이네요 ㅎㅎ",
+    createdAt: "01-06 14:40",
+    isOwner: false,
+  },
+  {
+    id: 3,
+    author: "익명123",
+    content: "감사합니다!",
+    createdAt: "01-06 14:45",
+    isOwner: true,
+  },
 ];
 
 export default function PostDetailPage() {
@@ -60,7 +78,10 @@ export default function PostDetailPage() {
         {/* 작성자 정보 */}
         <div className="px-3 py-2 border-b border-[var(--border)] flex items-center justify-between bg-[#fafafa]">
           <span className="text-[12px] text-[var(--text-muted)]">
-            작성자: <strong className="text-[var(--foreground)]">{mockPost.author}</strong>
+            작성자:{" "}
+            <strong className="text-[var(--foreground)]">
+              {mockPost.author}
+            </strong>
           </span>
           {mockPost.isOwner && (
             <div className="flex items-center gap-2">
@@ -99,7 +120,10 @@ export default function PostDetailPage() {
               🗣️
             </span>
             <span className="text-[12px] text-[var(--text-muted)] group-hover:text-[var(--primary-dark)]">
-              지껄 <strong className="text-[var(--primary-dark)]">{mockPost.likeCount}</strong>
+              지껄{" "}
+              <strong className="text-[var(--primary-dark)]">
+                {mockPost.likeCount}
+              </strong>
             </span>
           </button>
         </div>
@@ -118,7 +142,11 @@ export default function PostDetailPage() {
       {/* 댓글 영역 */}
       <div className="card">
         <div className="card-header">
-          댓글 <span className="text-[var(--primary-dark)]">{mockComments.length}</span>개
+          댓글{" "}
+          <span className="text-[var(--primary-dark)]">
+            {mockComments.length}
+          </span>
+          개
         </div>
 
         {/* 댓글 목록 */}
