@@ -48,9 +48,9 @@ export const logout = async (): Promise<{
  * @auth 인증 필요 (credentials: 'include' 설정 필수)
  * @description 현재 접속 중인 사용자의 세션 정보를 확인하여 사용자 데이터를 가져옵니다.
  * @throws {401} 로그인이 필요합니다
- * * @returns {Promise<{success: boolean}>} 로그인 상태일 경우 사용자 객체 반환
+ * * @returns {Promise<AuthResponse>} 로그인 상태일 경우 사용자 객체 반환
  */
-export const getMe = async (): Promise<{ success: boolean }> => {
+export const getMe = async (): Promise<AuthResponse> => {
   const response = await instance.get("/api/auth/me");
   return response.data;
 };

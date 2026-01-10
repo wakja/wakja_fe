@@ -2,9 +2,9 @@
 export interface PostListItem {
   id: number;
   title: string | null;
-  author: string;
+  author_nickname: string;
   created_at: string;
-  views: number;
+  view_count: number;
   like_count: number;
   comment_count: number;
 }
@@ -13,31 +13,34 @@ export interface PostListItem {
 export interface PostDetail {
   id: number;
   title: string | null;
-  content_md: string;
-  author: string;
+  content: string;
+  author_nickname: string;
   author_id: string;
   created_at: string;
-  views: number;
+  view_count: number;
   like_count: number;
   is_owner: boolean;
-  has_liked: boolean;
+  is_liked: boolean;
+  images?: string[];
 }
 
 // 게시글 작성 요청
 export interface CreatePostRequest {
   title?: string;
-  content_md: string;
+  content: string;
+  images?: string[];
 }
 
 // 게시글 수정 요청
 export interface UpdatePostRequest {
   title?: string;
-  content_md?: string;
+  content?: string;
+  images?: string[];
 }
 
 // 페이지네이션 응답
 export interface PaginatedResponse<T> {
-  items: T[];
+  posts: T[];
   total: number;
   page: number;
   per_page: number;

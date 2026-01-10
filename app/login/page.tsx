@@ -1,8 +1,32 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useLogin } from "@/hooks/auth";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const loginMutation = useLogin();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!email || !password) {
+      setError("이메일과 비밀번호를 입력해주세요.");
+      return;
+    }
+
+    try {
+      await loginMutation.mutateAsync({ email, password });
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "로그인에 실패했습니다.");
+    }
+  };
+
   return (
     <div className="flex-1 flex items-center justify-center py-8">
       <div className="w-full max-w-[360px] mx-4">
@@ -22,7 +46,14 @@ export default function LoginPage() {
         {/* 로그인 폼 */}
         <div className="card">
           <div className="card-body">
-            <form>
+            <form onSubmit={handleSubmit}>
+              {/* 에러 메시지 */}
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 text-red-600 text-[13px] rounded">
+                  {error}
+                </div>
+              )}
+
               {/* 이메일 */}
               <div className="mb-4">
                 <label className="block text-[12px] text-[var(--text-muted)] mb-2">
@@ -32,6 +63,8 @@ export default function LoginPage() {
                   type="email"
                   className="input"
                   placeholder="example@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -44,6 +77,8 @@ export default function LoginPage() {
                   type="password"
                   className="input"
                   placeholder="비밀번호를 입력하세요"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
 
@@ -51,8 +86,9 @@ export default function LoginPage() {
               <button
                 type="submit"
                 className="btn btn-primary w-full py-3 text-[14px]"
+                disabled={loginMutation.isPending}
               >
-                로그인
+                {loginMutation.isPending ? "로그인 중..." : "로그인"}
               </button>
             </form>
 

@@ -1,10 +1,124 @@
 "use client";
 
+import { Suspense, useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import dynamic from "next/dynamic";
+import { useAuth } from "@/hooks/auth";
+import { useGetPost, useCreatePost, useUpdatePost } from "@/hooks/post";
+import { useUploadImage } from "@/hooks/upload";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
-export default function WritePage() {
-  // TODO: 수정 모드 처리 (searchParams에서 edit 파라미터 확인)
-  const isEditMode = false;
+const MDXEditorWrapper = dynamic(
+  () => import("@/components/MDXEditorWrapper"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[300px]">
+        <LoadingSpinner />
+      </div>
+    ),
+  }
+);
+
+function WritePageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const editPostId = searchParams.get("id");
+  const isEditMode = !!editPostId;
+
+  const { isLoggedIn, isLoading: authLoading } = useAuth();
+  const { data: postData } = useGetPost(editPostId ? Number(editPostId) : 0);
+  const createPostMutation = useCreatePost();
+  const updatePostMutation = useUpdatePost(editPostId ? Number(editPostId) : 0);
+  const uploadImageMutation = useUploadImage();
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync form state with server data for edit mode
+  useEffect(() => {
+    if (postData?.data) {
+      const data = postData.data;
+      setTitle(data.title ?? "");
+      setContent(data.content ?? "");
+      setImages(data.images ?? []);
+    }
+  }, [postData]);
+
+  useEffect(() => {
+    if (!authLoading && !isLoggedIn) {
+      alert("로그인이 필요합니다.");
+      router.push("/login");
+    }
+  }, [authLoading, isLoggedIn, router]);
+
+  const handleImageUpload = async (file: File) => {
+    if (images.length >= 2) {
+      alert("이미지는 최대 2장까지 첨부 가능합니다.");
+      return;
+    }
+
+    try {
+      const result = await uploadImageMutation.mutateAsync(file);
+      const imageUrl = result.data?.url;
+      if (imageUrl) {
+        setImages((prev) => [...prev, imageUrl]);
+      }
+    } catch {
+      alert("이미지 업로드에 실패했습니다.");
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!content.trim()) {
+      alert("본문을 입력해주세요.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const postData = {
+        title: title.trim() || undefined,
+        content: content.trim(),
+        images: images.length > 0 ? images : undefined,
+      };
+
+      if (isEditMode) {
+        await updatePostMutation.mutateAsync(postData);
+      } else {
+        await createPostMutation.mutateAsync(postData);
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof error.response === "object" &&
+        "data" in error.response &&
+        error.response.data &&
+        typeof error.response.data === "object" &&
+        "message" in error.response.data &&
+        typeof error.response.data.message === "string"
+          ? error.response.data.message
+          : "게시글 저장에 실패했습니다.";
+      alert(errorMessage);
+      setIsSubmitting(false);
+    }
+  };
+
+  if (authLoading) {
+    return (
+      <main className="container py-4">
+        <LoadingSpinner />
+      </main>
+    );
+  }
 
   return (
     <main className="container py-4">
@@ -14,7 +128,7 @@ export default function WritePage() {
           {isEditMode ? "글 수정" : "글 작성"}
         </h1>
         <Link
-          href="/feed"
+          href="/post"
           className="text-[12px] text-[var(--text-muted)] hover:text-[var(--foreground)]"
         >
           취소
@@ -33,87 +147,26 @@ export default function WritePage() {
               type="text"
               className="input"
               placeholder="제목을 입력하세요"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
 
-          {/* 본문 입력 (마크다운 에디터) */}
+          {/* 본문 입력 (MDX 에디터 - WYSIWYG) */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <label className="block text-[12px] text-[var(--text-muted)]">
                 본문 <span className="text-[var(--danger)]">*</span>
               </label>
               <span className="text-[11px] text-[var(--text-light)]">
-                마크다운 지원
+                리치 텍스트 편집기
               </span>
             </div>
 
-            {/* 에디터 툴바 */}
-            <div className="flex items-center gap-1 p-2 bg-[#f8f8f8] border border-[var(--border)] border-b-0 rounded-t-[2px]">
-              <button
-                type="button"
-                className="p-1 text-[12px] text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--border)] rounded-[2px]"
-                title="굵게"
-              >
-                <strong>B</strong>
-              </button>
-              <button
-                type="button"
-                className="p-1 text-[12px] text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--border)] rounded-[2px]"
-                title="기울임"
-              >
-                <em>I</em>
-              </button>
-              <button
-                type="button"
-                className="p-1 text-[12px] text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--border)] rounded-[2px]"
-                title="취소선"
-              >
-                <s>S</s>
-              </button>
-              <span className="w-px h-4 bg-[var(--border)] mx-1" />
-              <button
-                type="button"
-                className="p-1 text-[12px] text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--border)] rounded-[2px]"
-                title="링크"
-              >
-                🔗
-              </button>
-              <button
-                type="button"
-                className="p-1 text-[12px] text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--border)] rounded-[2px]"
-                title="이미지"
-              >
-                🖼️
-              </button>
-              <span className="w-px h-4 bg-[var(--border)] mx-1" />
-              <button
-                type="button"
-                className="p-1 text-[12px] text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--border)] rounded-[2px]"
-                title="목록"
-              >
-                •
-              </button>
-              <button
-                type="button"
-                className="p-1 text-[12px] text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--border)] rounded-[2px]"
-                title="인용"
-              >
-                &gt;
-              </button>
-              <button
-                type="button"
-                className="p-1 text-[12px] text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--border)] rounded-[2px]"
-                title="코드"
-              >
-                {"</>"}
-              </button>
+            {/* MDX Editor */}
+            <div className="border border-[var(--border)] rounded-[2px] overflow-hidden">
+              <MDXEditorWrapper content={content} onChange={setContent} />
             </div>
-
-            {/* 텍스트에어리어 */}
-            <textarea
-              className="w-full p-3 border border-[var(--border)] border-t-0 rounded-b-[2px] text-[13px] min-h-[300px] resize-y focus:outline-none focus:border-[var(--primary)]"
-              placeholder="내용을 입력하세요...&#10;&#10;마크다운 문법을 사용할 수 있습니다.&#10;이미지는 클립보드에서 붙여넣기 가능합니다. (최대 2장)"
-            />
           </div>
 
           {/* 이미지 첨부 영역 */}
@@ -123,36 +176,89 @@ export default function WritePage() {
               <span className="text-[var(--text-light)]">(최대 2장)</span>
             </label>
             <div className="flex items-center gap-3">
-              <label className="flex items-center justify-center w-[80px] h-[80px] border border-dashed border-[var(--border)] rounded-[2px] cursor-pointer hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 transition-colors">
-                <span className="text-[24px] text-[var(--text-light)]">+</span>
-                <input type="file" accept="image/*" className="hidden" />
-              </label>
-              {/* 첨부된 이미지 미리보기 예시 */}
-              <div className="relative w-[80px] h-[80px] border border-[var(--border)] rounded-[2px] bg-[#f8f8f8] flex items-center justify-center">
-                <span className="text-[11px] text-[var(--text-light)]">
-                  미리보기
-                </span>
-                <button
-                  type="button"
-                  className="absolute -top-2 -right-2 w-5 h-5 bg-[var(--danger)] text-white rounded-full text-[12px] leading-none flex items-center justify-center hover:bg-[var(--danger-hover)]"
+              {images.length < 2 && (
+                <label className="flex items-center justify-center w-[80px] h-[80px] border border-dashed border-[var(--border)] rounded-[2px] cursor-pointer hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 transition-colors">
+                  <span className="text-[24px] text-[var(--text-light)]">
+                    +
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageUpload(file);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              )}
+
+              {images.map((url, index) => (
+                <div
+                  key={index}
+                  className="relative w-[80px] h-[80px] border border-[var(--border)] rounded-[2px] overflow-visible"
                 >
-                  &times;
-                </button>
-              </div>
+                  <div className="relative w-full h-full overflow-hidden rounded-[2px]">
+                    <Image
+                      src={url}
+                      alt={`첨부 이미지 ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setImages((prev) => prev.filter((_, i) => i !== index))
+                    }
+                    className="absolute -top-2 -right-2 z-10 w-6 h-6 bg-[var(--danger)] text-white rounded-full text-[14px] font-bold leading-none flex items-center justify-center hover:bg-[var(--danger-hover)] shadow-md border-2 border-white"
+                    title="이미지 삭제"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* 제출 버튼 */}
           <div className="flex justify-end gap-2 pt-4 border-t border-[var(--border)]">
-            <Link href="/feed" className="btn btn-secondary">
+            <Link href="/post" className="btn btn-secondary">
               취소
             </Link>
-            <button type="button" className="btn btn-primary">
-              {isEditMode ? "수정하기" : "작성하기"}
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="btn btn-primary"
+            >
+              {isSubmitting
+                ? isEditMode
+                  ? "수정 중..."
+                  : "작성 중..."
+                : isEditMode
+                ? "수정하기"
+                : "작성하기"}
             </button>
           </div>
         </div>
       </div>
     </main>
+  );
+}
+
+function WritePageContainer() {
+  const searchParams = useSearchParams();
+  const editPostId = searchParams.get("id");
+
+  return <WritePageContent key={editPostId || "new"} />;
+}
+
+export default function WritePage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <WritePageContainer />
+    </Suspense>
   );
 }

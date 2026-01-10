@@ -1,7 +1,7 @@
 // 댓글
 export interface Comment {
   id: number;
-  author: string;
+  author_nickname: string;
   content: string;
   created_at: string;
   is_owner: boolean;

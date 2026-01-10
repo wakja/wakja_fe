@@ -2,7 +2,7 @@ import Link from "next/link";
 
 interface PostCardProps {
   id: number;
-  title: string;
+  title: string | null;
   author: string;
   createdAt: string;
   views: number;
@@ -29,7 +29,7 @@ export default function PostCard({
           href={`/post/${id}`}
           className="text-[13px] text-[var(--foreground)] hover:text-[var(--primary-dark)] hover:underline"
         >
-          {title}
+          {title || "(제목 없음)"}
           {commentCount > 0 && (
             <span className="ml-1 text-[var(--primary-dark)] text-[11px]">
               [{commentCount}]

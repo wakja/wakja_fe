@@ -26,8 +26,7 @@ export const uploadImage = async (
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await instance.post("/api/upload", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  // axios가 FormData를 감지하여 자동으로 Content-Type을 설정함 (boundary 포함)
+  const res = await instance.post("/api/upload", formData);
   return res.data;
 };

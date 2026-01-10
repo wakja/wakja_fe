@@ -1,56 +1,76 @@
+"use client";
+
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useGetPosts } from "@/hooks/post";
 import PostCard from "@/components/PostCard";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
-// 더미 데이터 (나중에 API 연동)
-const mockPosts = [
-  {
-    id: 1,
-    title: "첫 번째 글입니다",
-    author: "익명123",
-    createdAt: "01-06",
-    views: 42,
-    commentCount: 3,
-    likeCount: 5,
-  },
-  {
-    id: 2,
-    title: "오늘 날씨가 좋네요",
-    author: "하늘이",
-    createdAt: "01-06",
-    views: 128,
-    commentCount: 12,
-    likeCount: 23,
-  },
-  {
-    id: 3,
-    title: "이번 주 추천 맛집",
-    author: "먹방러",
-    createdAt: "01-05",
-    views: 89,
-    commentCount: 7,
-    likeCount: 15,
-  },
-  {
-    id: 4,
-    title: "새해 목표 공유해요",
-    author: "열정맨",
-    createdAt: "01-05",
-    views: 203,
-    commentCount: 28,
-    likeCount: 45,
-  },
-  {
-    id: 5,
-    title: "취미 추천 받습니다",
-    author: "심심이",
-    createdAt: "01-04",
-    views: 67,
-    commentCount: 5,
-    likeCount: 8,
-  },
-];
+function FeedPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const searchQuery = searchParams.get("search") || "";
 
-export default function FeedPage() {
+  const [searchInput, setSearchInput] = useState(searchQuery);
+
+  const { data, isLoading, isError } = useGetPosts(currentPage, searchQuery);
+
+  const posts = data?.data?.posts ?? [];
+  const totalPages = data?.data?.total_pages ?? 1;
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    params.set("page", "1");
+    if (searchInput) {
+      params.set("search", searchInput);
+    }
+    router.push(`/post?${params.toString()}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    if (searchQuery) {
+      params.set("search", searchQuery);
+    }
+    router.push(`/post?${params.toString()}`);
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    const endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+    if (endPage - startPage < maxVisible - 1) {
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          type="button"
+          onClick={() => handlePageChange(i)}
+          className={`btn btn-sm ${
+            i === currentPage ? "btn-primary" : "btn-secondary"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
+
   return (
     <main className="container py-4">
       {/* 헤더 영역 */}
@@ -69,66 +89,104 @@ export default function FeedPage() {
           type="text"
           className="input flex-1"
           placeholder="검색어를 입력하세요"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
-        <button type="button" className="btn btn-secondary">
+        <button
+          type="button"
+          onClick={handleSearch}
+          className="btn btn-secondary"
+        >
           검색
         </button>
       </div>
 
-      {/* 글 목록 테이블 */}
-      <table className="post-table">
-        <thead>
-          <tr>
-            <th className="text-center">번호</th>
-            <th>제목</th>
-            <th className="text-center">글쓴이</th>
-            <th className="text-center">날짜</th>
-            <th className="text-center">조회</th>
-            <th className="text-center">따봉</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mockPosts.map((post) => (
-            <PostCard
-              key={post.id}
-              id={post.id}
-              title={post.title}
-              author={post.author}
-              createdAt={post.createdAt}
-              views={post.views}
-              commentCount={post.commentCount}
-              likeCount={post.likeCount}
-            />
-          ))}
-        </tbody>
-      </table>
+      {/* 로딩/에러 상태 */}
+      {isLoading && <LoadingSpinner />}
 
-      {/* 페이지네이션 / 무한스크롤 영역 */}
-      <div className="flex justify-center mt-4">
-        <div className="flex items-center gap-1">
-          <button type="button" className="btn btn-sm btn-secondary">
-            &laquo;
-          </button>
-          <button type="button" className="btn btn-sm btn-primary">
-            1
-          </button>
-          <button type="button" className="btn btn-sm btn-secondary">
-            2
-          </button>
-          <button type="button" className="btn btn-sm btn-secondary">
-            3
-          </button>
-          <button type="button" className="btn btn-sm btn-secondary">
-            4
-          </button>
-          <button type="button" className="btn btn-sm btn-secondary">
-            5
-          </button>
-          <button type="button" className="btn btn-sm btn-secondary">
-            &raquo;
-          </button>
+      {isError && (
+        <div className="text-center py-8 text-[var(--text-muted)]">
+          게시글을 불러오는데 실패했습니다.
         </div>
-      </div>
+      )}
+
+      {/* 글 목록 테이블 */}
+      {!isLoading && !isError && (
+        <>
+          {posts.length === 0 ? (
+            <div className="text-center py-8 text-[var(--text-muted)]">
+              {searchQuery
+                ? "검색 결과가 없습니다."
+                : "아직 작성된 게시글이 없습니다."}
+            </div>
+          ) : (
+            <table className="post-table">
+              <thead>
+                <tr>
+                  <th className="text-center">번호</th>
+                  <th>제목</th>
+                  <th className="text-center">글쓴이</th>
+                  <th className="text-center">날짜</th>
+                  <th className="text-center">조회</th>
+                  <th className="text-center">따봉</th>
+                </tr>
+              </thead>
+              <tbody>
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    id={post.id}
+                    title={post.title}
+                    author={post.author_nickname}
+                    createdAt={post.created_at}
+                    views={post.view_count}
+                    commentCount={post.comment_count}
+                    likeCount={post.like_count}
+                  />
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {/* 페이지네이션 */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4">
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="btn btn-sm btn-secondary disabled:opacity-50"
+                >
+                  &laquo;
+                </button>
+
+                {renderPageNumbers()}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handlePageChange(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="btn btn-sm btn-secondary disabled:opacity-50"
+                >
+                  &raquo;
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </main>
+  );
+}
+
+export default function FeedPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <FeedPageContent />
+    </Suspense>
   );
 }

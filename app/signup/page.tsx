@@ -1,8 +1,44 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useSignup } from "@/hooks/auth";
 
 export default function SignupPage() {
+  const [nickname, setNickname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [error, setError] = useState("");
+
+  const signupMutation = useSignup();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!nickname || !email || !password || !passwordConfirm) {
+      setError("모든 필드를 입력해주세요.");
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      setError("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("비밀번호는 8자 이상이어야 합니다.");
+      return;
+    }
+
+    try {
+      await signupMutation.mutateAsync({ nickname, email, password });
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "회원가입에 실패했습니다.");
+    }
+  };
+
   return (
     <div className="flex-1 flex items-center justify-center py-8">
       <div className="w-full max-w-[360px] mx-4">
@@ -22,7 +58,14 @@ export default function SignupPage() {
         {/* 회원가입 폼 */}
         <div className="card">
           <div className="card-body">
-            <form>
+            <form onSubmit={handleSubmit}>
+              {/* 에러 메시지 */}
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 text-red-600 text-[13px] rounded">
+                  {error}
+                </div>
+              )}
+
               {/* 닉네임 */}
               <div className="mb-4">
                 <label className="block text-[12px] text-[var(--text-muted)] mb-2">
@@ -32,6 +75,8 @@ export default function SignupPage() {
                   type="text"
                   className="input"
                   placeholder="사용할 닉네임을 입력하세요"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
                 />
                 <p className="text-[11px] text-[var(--text-light)] mt-1">
                   2~12자, 한글/영문/숫자 사용 가능
@@ -47,6 +92,8 @@ export default function SignupPage() {
                   type="email"
                   className="input"
                   placeholder="example@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -59,6 +106,8 @@ export default function SignupPage() {
                   type="password"
                   className="input"
                   placeholder="비밀번호를 입력하세요"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <p className="text-[11px] text-[var(--text-light)] mt-1">
                   8자 이상, 영문/숫자 조합
@@ -74,6 +123,8 @@ export default function SignupPage() {
                   type="password"
                   className="input"
                   placeholder="비밀번호를 다시 입력하세요"
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
                 />
               </div>
 
@@ -81,8 +132,9 @@ export default function SignupPage() {
               <button
                 type="submit"
                 className="btn btn-primary w-full py-3 text-[14px]"
+                disabled={signupMutation.isPending}
               >
-                회원가입
+                {signupMutation.isPending ? "가입 중..." : "회원가입"}
               </button>
             </form>
 

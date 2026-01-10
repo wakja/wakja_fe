@@ -123,3 +123,23 @@ export const getPost = async (id: number): Promise<ApiResponse<PostDetail>> => {
 - **Korean Language**: UI text, comments, and variable names often use Korean
 - **Authentication**: Cookie-based (session) authentication via backend API
 - **Environment Variables**: Store `NEXT_PUBLIC_API_BASE_URL` in `.env` (not committed)
+
+## Coding Rules
+
+### Type Safety
+
+- **Do not use `any`**. Prefer:
+  - Explicit types/interfaces
+  - `unknown` + runtime narrowing when needed
+  - Generics for reusable utilities/hooks
+- If a value is temporarily untyped, use `unknown` and narrow it instead of `any`.
+
+### Images
+
+- **Do not use `<img>` tags** in React components.
+- Use Next.js built-in **`next/image`** instead:
+  - `import Image from "next/image";`
+  - Provide `width/height` (or `fill`) and a meaningful `alt`.
+- Only exceptions:
+  - Non-React documents like Markdown/README (GitHub rendering)
+  - Cases where `next/image` cannot be used (must be justified in code comments)

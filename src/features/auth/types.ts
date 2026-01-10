@@ -3,6 +3,7 @@ export interface User {
   id: string;
   email: string;
   nickname: string;
+  token?: string; // JWT 토큰 (로그인 시에만 포함)
 }
 
 // 로그인 요청
@@ -22,5 +23,6 @@ export interface SignupRequest {
 export interface AuthResponse {
   success: boolean;
   data?: User;
+  token?: string;
   error?: string;
 }
